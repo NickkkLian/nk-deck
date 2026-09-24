@@ -12,6 +12,7 @@ before release to prove their checks react.
 - Five invariants: every title states a conclusion; five points at most, one idea each; every measurement names its source or the deck says it is illustrative; one slide prints as one page with nothing cut off; it works from the keyboard and without a network.
 - `assets/starter.html`, a working ten-slide deck on a 1280×720 stage: arrow keys, space, Home/End, P to print, `#7` opens slide 7, a phone layout that stays on screens, and `?check=1` to measure which slides are too full.
 - `scripts/make_deck.py`: a JSON outline becomes one file, tokens inlined, nothing fetched. It refuses an outline whose titles are labels, whose slides have a sixth point, or whose numbers have no source.
+- The deck carries its own type: the Latin subsets of Fraunces, Inter and Space Mono (SIL OFL 1.1, licences in `assets/fonts/`) are inlined, which adds 135,972 bytes to every deck. It still fetches nothing when it opens.
 - `scripts/deck_check.py`: eleven rules on the file, including the print CSS that keeps one slide per page.
 - `scripts/print_check.py`: prints the deck in Chrome and checks the PDF has one page per slide and no slide is too full — the failure a file check cannot see.
 - The deck and two of the scripts are standard library only; `print_check.py` needs Chrome or Chromium.
@@ -62,7 +63,7 @@ Without opening a session, the same two steps work from a shell: `claude plugin 
 
 <img src="https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/panel-route/panel-route.gif" alt="Adding the marketplace and installing a skill in the desktop app" width="640">
 
-<sub>The repository list in this recording shows the recorder's own repositories because a GitHub account is connected; yours will show yours. Type the full name as in step 4.</sub>
+<sub>Recorded on 2026-09-16, when the marketplace listed ten skills, all at version 0.1.0; it lists more now. The repository list in this recording shows the recorder's own repositories because a GitHub account is connected; yours will show yours. Type the full name as in step 4.</sub>
 
 1. In the chat box, type `/plugin marketplace` and press Enter (or open **Settings → Customize → Plugins**). The **Plugins** panel opens.
    <br><img src="https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/panel-route/step1-type-plugin-marketplace.png" alt="/plugin marketplace typed in the chat box" width="480">
