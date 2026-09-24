@@ -4,8 +4,8 @@
 
 A [Claude Code](https://code.claude.com) skill. Turn one sentence — a topic and who it is for — into a ten-slide single-file HTML deck whose titles carry the argument on their own, five points at most per slide, a source under every number, and a printout that is the same deck page for page.
 
-Part of [nickkk-skills](https://github.com/NickkkLian/nickkk-skills) — agent skills whose scripts were broken on purpose
-before release to prove their checks react.
+Part of [nickkk-skills](https://github.com/NickkkLian/nickkk-skills) — agent skills that ship a self-test with every script; the Verify
+section below says which of them were broken on purpose before release to prove they react.
 
 ![nk-deck demo: one idea in, a finished page out](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/nk-deck.gif)
 
@@ -29,6 +29,14 @@ The full procedure, the boundaries and where the rules came from are in [SKILL.m
 4. Check it
 5. Print it
 6. Read the titles alone
+
+## Why it is built this way
+
+**The idea.** A deck is read in a hurry. Somebody flicks through it before the meeting, or prints it and reads the titles only. So in this deck the titles carry the argument, the points carry the evidence, and the printout is the deck — ten slides, ten pages, nothing cut off.
+
+**Where it came from.** The layout, the keyboard handling and the print rules come from portfolio decks of my own that had to print as PDFs.
+
+**Evidence.** What was broken on purpose to show that the self-tests can fail is under [Verify](#verify); what was run end to end, and in which agent, is under [Compatibility](#compatibility).
 
 ## Install
 

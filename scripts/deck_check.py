@@ -80,7 +80,7 @@ NUMBER = re.compile("(?i)" + "|".join(p for _, p in MEASURE))
 # They are taken out before NUMBER looks. A bare year stays a number ("2019 was our best year" is a claim);
 # a year after in/since/from/until/by/of/during, after a month or a quarter, or in a range, is a date.
 # Months are matched capitalised (so "12 may leave" stays a sentence), a day only 1–31, and a number is taken for a
-# date only where it cannot also be a count: a re-audit showed the first version stripping "December 40" out of
+# date only where it cannot also be a count: the first version stripped "December 40" out of
 # "In December 40% of orders…", "March 12" out of "In March 12 customers cancelled", "Q3 40" and "of 2000 orders".
 _MONTH = r"(?:Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|June?|July?|Aug(?:ust)?|Sep(?:t(?:ember)?)?|Oct(?:ober)?|Nov(?:ember)?|Dec(?:ember)?)"
 _DAY = r"(?:3[01]|[12]\d|0?[1-9])"
@@ -106,8 +106,8 @@ NOT_A_MEASURE = re.compile(
     # 7am, 7 pm, 10:30
     r"|\b\d{1,2}(?::\d{2})?\s*(?i:a\.?m\.?|p\.?m\.?)(?![a-z])|\b\d{1,2}:\d{2}\b")
 # the same, written in Chinese: a year, a month and day, a day of the month, a time of day (after a word for morning or
-# afternoon, or with minutes or "half"), the Nth quarter, the Nth week — a Chinese outline was refused on its dates
-# until 2026-09-22. A bare hour ("3" + the word for o'clock) stays a number: it reads as often as "three points".
+# afternoon, or with minutes or "half"), the Nth quarter, the Nth week — without these, a Chinese outline was refused
+# on its dates. A bare hour ("3" + the word for o'clock) stays a number: it reads as often as "three points".
 CJK_NOT_A_MEASURE = re.compile(
     r"\d{4}\s*\u5e74(?:\s*\d{1,2}\s*\u6708(?:\s*\d{1,2}\s*[\u65e5\u53f7])?)?"
     r"|\d{1,2}\s*\u6708(?:\s*\d{1,2}\s*[\u65e5\u53f7])?|\d{1,2}\s*\u53f7"
@@ -125,7 +125,7 @@ KEYS = ["ArrowRight", "ArrowLeft", "PageDown", "PageUp", "Home", "End", '" "', "
 # What a print rule may set: where pages break, what shows, colours — and, on the template's own frame (html, body,
 # .viewport, .stage, .slide, the key hint), the box that makes one slide one page. Nothing that moves or resizes what is
 # on a slide. The first version listed forbidden properties and missed margin, gap, font-family, word-spacing, scale
-# and transform: a print-only gap pushed the last point under the footer with every check green (re-audit, 2026-09-22).
+# and transform: a print-only gap pushed the last point under the footer with every check green.
 PRINT_ANYWHERE = {"background", "background-color", "color", "visibility", "page-break-after", "page-break-before",
                   "page-break-inside", "break-after", "break-before", "break-inside", "-webkit-print-color-adjust",
                   "print-color-adjust"}
@@ -157,7 +157,7 @@ def print_changes(pb):
 def says_illustrative(html):
     """Whether the page can put the word on the screen: in the text of its markup, or in a string its scripts use —
     not in the data block, a style sheet, a comment, an attribute, a class name, or a variable or property name. The
-    template's CSS class alone once satisfied this (audit, 2026-09-22); so did a comment or a variable (re-audit)."""
+    template's CSS class alone once satisfied this; so did a comment or a variable."""
     h = re.sub(r'<script type="application/json".*?</script>', "", html, flags=re.S)
     h = re.sub(r"<style[^>]*>.*?</style>", "", h, flags=re.S)
     h = re.sub(r"<!--.*?-->", "", h, flags=re.S)
@@ -352,7 +352,7 @@ def selftest():
         # "Tuesdays keep losing money" and "Summary", in Chinese: counted in characters, not in words
         ("D03 a Chinese title that argues is measured in characters", S(deck=T("\u5468\u4e8c\u4e00\u76f4\u5728\u4e8f\u94b1")), set()),
         ("D03 a Chinese title too short to say anything", S(deck=T("\u603b\u7ed3")), {"D03"}),
-        # re-audit, 2026-09-22: "is" and "are" in the label words made every "X is at risk" a label; a Chinese title with
+        # "is" and "are" in the label words once made every "X is at risk" a label; a Chinese title with
         # one English word ("Q3 revenue fell by a fifth", in Chinese) was judged on that word alone
         ("D03 a sentence with 'is' in it is not a label", S(deck=T("The roadmap is at risk")), set()),
         ("D03 a Chinese title with an English word is not a label", S(deck=T("Q3 \u8425\u6536\u540c\u6bd4\u4e0b\u964d\u4e24\u6210")), set()),
@@ -381,7 +381,7 @@ def selftest():
                                                                sub=[NOTICE]), set()),
         # the cover notice written in Chinese ("the numbers in this deck are illustrative")
         ("D05 a notice written in Chinese is a notice", S(deck=ILL, sub=[('<div id="stage"></div>', '<div id="stage"></div><p>\u672c\u6f14\u793a\u4e2d\u7684\u6570\u5b57\u5747\u4e3a\u793a\u610f</p>')]), set()),
-        # re-audit: the first date rule stripped these numbers and let them through with no source
+        # the first date rule stripped these numbers and let them through with no source
         ("D05 a number after a month is still a number", S(deck=T("Custom cakes crowd out the bread", ["In December 40% of orders were custom cakes"])), {"D05"}),
         ("D05 a count after 'of' is still a number", S(deck=T("The order book is overflowing", ["A backlog of 2000 orders"])), {"D05"}),
         ("D05 a number after a quarter is still a number", S(deck=T("Late orders are a third-quarter problem", ["In Q3 40% of orders were late"])), {"D05"}),
