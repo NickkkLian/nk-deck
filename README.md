@@ -1,5 +1,7 @@
 # nk-deck
 
+![nk-deck](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/social/nk-deck.png)
+
 A [Claude Code](https://code.claude.com) skill. Turn one sentence — a topic and who it is for — into a ten-slide single-file HTML deck whose titles carry the argument on their own, five points at most per slide, a source under every number, and a printout that is the same deck page for page.
 
 Part of [nickkk-skills](https://github.com/NickkkLian/nickkk-skills) — agent skills whose scripts were broken on purpose
