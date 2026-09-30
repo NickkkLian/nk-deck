@@ -154,9 +154,22 @@
     if (s.sub) { var p = document.createElement("p"); p.className = "sub"; p.textContent = s.sub; el.appendChild(p); }
     if (s.points && s.points.length) {
       var ul = document.createElement("ul"); ul.className = "points";
-      s.points.forEach(function (pt) {
-        var li = document.createElement("li"); li.textContent = typeof pt === "string" ? pt : pt.text;
-        if (pt.source) { var src = document.createElement("span"); src.className = "src"; src.textContent = "source: " + pt.source; li.appendChild(src); }
+      s.points.forEach(function (pt, j) {
+        var li = document.createElement("li"), text = typeof pt === "string" ? pt : pt.text;
+        /* a point with a source: each run of digits in it opens that source when clicked (data-nk-src, the id
+           make_deck.py gives the point in the page's sources manifest); with no digits, the source note does */
+        var id = pt.source ? "s" + (i + 1) + "p" + (j + 1) : null, digits = /\d(?:[\d,.]*\d)?%?/g, last = 0, m, traced = false;
+        while (id && (m = digits.exec(text))) {
+          li.appendChild(document.createTextNode(text.slice(last, m.index)));
+          var n = document.createElement("span"); n.setAttribute("data-nk-src", id); n.textContent = m[0];
+          li.appendChild(n); last = digits.lastIndex; traced = true;
+        }
+        li.appendChild(document.createTextNode(text.slice(last)));
+        if (pt.source) {
+          var src = document.createElement("span"); src.className = "src"; src.textContent = "source: " + pt.source;
+          if (!traced) src.setAttribute("data-nk-src", id);
+          li.appendChild(src);
+        }
         ul.appendChild(li);
       });
       el.appendChild(ul);
@@ -188,6 +201,9 @@
   }
   function fromHash() { var n = parseInt(location.hash.slice(1), 10); return isFinite(n) && n >= 1 ? n - 1 : 0; }
   addEventListener("keydown", function (e) {
+    /* keys inside a number's source panel, and Enter or Space on a traced number, belong to that panel */
+    var t = e.target && e.target.closest ? e.target : null;
+    if (t && (t.closest(".nk-src-panel") || ((e.key === " " || e.key === "Enter") && t.closest("[data-nk-src]")))) return;
     if (["ArrowRight", " ", "PageDown"].indexOf(e.key) >= 0) { e.preventDefault(); show(cur + 1); }
     else if (["ArrowLeft", "PageUp"].indexOf(e.key) >= 0) { e.preventDefault(); show(cur - 1); }
     else if (e.key === "Home") { show(0); }

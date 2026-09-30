@@ -29,6 +29,7 @@ FONT_NOTICE = ("/* Fraunces (c) 2020 The Fraunces Project Authors; Inter (c) 201
                "   the licence texts ship with the skill in assets/fonts/. Inlined so the file fetches nothing. */")
 sys.path.insert(0, HERE)
 import deck_check  # noqa: E402  — one definition of the rules, shared with the checker
+import numsrc  # noqa: E402  — the clickable number sources layer shared with the other nk-* page skills (D12)
 
 
 def font_faces(font_dir=FONT_DIR):
@@ -68,7 +69,8 @@ def build(deck, template, tokens):
     if link:
         page = (page[:link.start()] + '\n<style id="brand-fonts">\n' + font_faces() + '\n</style>'
                 + '\n<style id="design-tokens">\n' + tokens.strip() + '\n</style>' + page[link.end():])
-    return page
+    src = deck_check.sources(deck)
+    return numsrc.inject(page, src) if src else page
 
 
 def main(argv):

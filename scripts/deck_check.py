@@ -28,12 +28,37 @@
   D09  colours come from the token file, not from raw hex in the deck's own styles
   D10  a deck built for delivery is one file: no external stylesheet or script
   D11  no "thank you" slide: the last slide is the decision or the ask
+  D12  a point that names a source opens it: clicking the point's numbers (or its source note, when the point has
+       no digits) shows the source, how the number got there and what was not checked. The page carries the shared
+       number-sources layer unchanged (numsrc.js and numsrc.css), a manifest entry for every such point with its
+       source word for word, and the template marks the numbers (data-nk-src)
 
 What it cannot see: whether a title is true, whether the argument holds, whether a slide's text actually fits —
 `print_check.py` prints the file in Chrome and counts pages for that. D03 and D05 are heuristics that read
 English; references/invariants.md lists what they get wrong. Exit 0 clean · 1 findings · 2 selftest failed.
 """
 import json, os, re, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import numsrc  # noqa: E402  — the clickable number sources layer shared with the other nk-* page skills
+
+VERSION = "0.1.3"   # written into the sources manifest as the generator
+
+
+def sources(deck):
+    """the manifest behind the page's numbers: one entry per point that names a source (the template marks that
+    point's digits, or its source note, with the same id s<slide>p<point>). None when no point names a source."""
+    page_wide = ["deck_check.py checks that a source is written under every measurement, not that the source says what the point says."]
+    if deck.get("illustrative"):
+        page_wide.insert(0, "The numbers in this deck are illustrative, not measured.")
+    src = numsrc.Sources(f"nk-deck {VERSION}", not_checked=page_wide)
+    for i, s in enumerate(deck.get("slides") or []):
+        for j, pt in enumerate(s.get("points") or []):
+            if isinstance(pt, dict) and str(pt.get("source") or "").strip():
+                src.add(f"s{i + 1}p{j + 1}", str(pt.get("text", "")) or f"slide {i + 1}, point {j + 1}", [{"text": str(pt["source"])}], "stated",
+                        "The source the author wrote for this point in the deck's outline; make_deck.py copied it word for word.",
+                        ["Nobody opened the source or compared the number with it."], live=True)
+    return src if src.to_dict()["sources"] else None
 
 # A title made only of these words is a label however long it is: "Results", but also "Results and next steps"
 # and "Summary of our key findings". Length alone cannot tell: a short sentence can argue ("Tuesdays lose money")
@@ -247,6 +272,20 @@ def check(path):
                            f"'illustrative': {source[:40]}")
     if deck.get("illustrative") and not says_illustrative(html):
         add("D05", "the deck is marked illustrative but the page never says so in words")
+    sourced = [(n, j, str(p["source"])) for n, s in enumerate(slides, 1) for j, p in enumerate(s.get("points") or [], 1)
+               if isinstance(p, dict) and str(p.get("source") or "").strip()]
+    if sourced:
+        broken = [f for f in numsrc.check(html) if f[1] == "error" and f[0] in ("N01", "N03", "N07", "N08")]
+        if broken:
+            add("D12", f"the numbers' sources cannot open ({broken[0][0]}: {broken[0][2][:90]}); build the deck again with make_deck.py")
+        else:
+            man = json.loads(re.search(r'<script type="application/json" id="nk-sources">(.*?)</script>', html, re.S).group(1))["sources"]
+            for n, j, src in sourced:
+                e = man.get(f"s{n}p{j}") or {}
+                if [x.get("text") for x in e.get("from") or []] != [src]:
+                    add("D12", f"slide {n}, point {j}: its source is not in the page's sources manifest word for word, so clicking its number does not show it")
+        if not re.search(r'setAttribute\(\s*"data-nk-src"', "\n".join(re.findall(r"<script(?![^>]*application/json)(?![^>]*nk-sources-runtime)[^>]*>(.*?)</script>", html, re.S))):
+            add("D12", "the page never marks a point's numbers as clickable (data-nk-src): its sources can never be opened")
     if slides and THANKS.match(slides[-1].get("title", "")):
         add("D11", "the last slide thanks the reader instead of stating the decision or the ask")
 
@@ -318,9 +357,15 @@ addEventListener("keydown", function (e) {
   else if (e.key === "Home") first(); else if (e.key === "End") last();
   else if (e.key === "p") print();
 });
+function mark(li, id) { li.setAttribute("data-nk-src", id); }
 </script></body></html>"""
     page = page.replace("__DECK__", json.dumps(deck))
     for old, new in over.pop("sub", []):
+        assert page.count(old) == 1, old
+        page = page.replace(old, new, 1)
+    src = sources(deck)
+    page = numsrc.inject(page, src) if src else page
+    for old, new in over.pop("post", []):            # changes made to the page after its sources were written in
         assert page.count(old) == 1, old
         page = page.replace(old, new, 1)
     return page
@@ -409,6 +454,11 @@ def selftest():
         ("D08 an outside request in single quotes", S(sub=[('<div id="stage">', "<img src='https://cdn.example.net/logo.png'><div id=\"stage\">")]), {"D08"}),
         ("D08 an outside request from the style sheet", S(sub=[(".slide { color: var(--text); }", ".slide { color: var(--text); background: url(https://cdn.example.net/paper.png); }")]), {"D08"}),
         ("D09 a raw colour", S(sub=[(".slide { color: var(--text); }", ".slide { color: #1a1a2e; }")]), {"D09"}),
+        ("D12 a sourced point with no entry in the sources manifest", S(post=[('"s2p1"', '"s9p9"')]), {"D12"}),
+        ("D12 a source changed after the manifest was written", S(post=[('"text": "till exports, August"', '"text": "till exports, July"')]), {"D12"}),
+        ("D12 the shared runtime edited", S(post=[("'use strict';", "'use strict'; var edited = 1;")]), {"D12"}),
+        ("D12 no entry says what was not checked", S(post=[('"Nobody opened the source or compared the number with it."', '""')]), {"D12"}),
+        ("D12 the numbers are never marked", S(sub=[('li.setAttribute("data-nk-src", id)', 'li.id = id')]), {"D12"}),
         ("D11 a thank-you slide", S(deck={"slides": [{"title": "Close the Tuesday shift from October"}, {"title": "Tuesdays cost more to open than they take in"}, {"title": "Thank you for reading this far today"}]}), {"D11"}),
     ]
     ok = True

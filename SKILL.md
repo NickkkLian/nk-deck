@@ -1,11 +1,11 @@
 ---
 name: nk-deck
-description: Turn one sentence — a topic and who it is for — into a ten-slide single-file HTML deck whose titles carry the argument on their own, five points at most per slide, a source under every number, and a printout that is the same deck page for page. Use when a decision, a proposal or a status needs to be read in two minutes or printed, when a slide deck has to work offline and from the keyboard, or when a PowerPoint would be more ceremony than the content deserves. scripts/make_deck.py writes the file from a JSON outline, scripts/deck_check.py checks eleven rules on it (labels for titles, a sixth point, a number with no source, a print layout that leaks), and scripts/print_check.py prints it in Chrome and counts the pages. Not a design tool: one layout, one token file, no images.
+description: Turn one sentence — a topic and who it is for — into a ten-slide single-file HTML deck whose titles carry the argument on their own, five points at most per slide, a source under every number, and a printout that is the same deck page for page. Use when a decision, a proposal or a status needs to be read in two minutes or printed, when a slide deck has to work offline and from the keyboard, or when a PowerPoint would be more ceremony than the content deserves. scripts/make_deck.py writes the file from a JSON outline, scripts/deck_check.py checks twelve rules on it (labels for titles, a sixth point, a number with no source, a print layout that leaks, a source that cannot be opened), and scripts/print_check.py prints it in Chrome and counts the pages. Not a design tool: one layout, one token file, no images.
 license: MIT
 compatibility: the deck and make_deck.py / deck_check.py are standard library only; print_check.py needs Google Chrome or Chromium to print.
 metadata:
   provenance: own practice (2026-09) — two portfolio decks that had to print cleanly, and a design system built for pages that say where their numbers come from; see Provenance
-  version: 0.1.2
+  version: 0.1.3
 ---
 # Deck: ten slides, titles that argue
 
@@ -38,13 +38,25 @@ the deck — ten slides, ten pages, nothing cut off.
    not hard-coded · D02 three to twenty slides · D03 titles are conclusions, not labels · D04 five points, each
    under 140 characters · D05 a source under every measurement · D06 print CSS that keeps one slide per page,
    changes nothing on a slide, and leaves the phone layout on screens · D07 arrows, space, Home/End, P, and #n · D08 nothing fetched ·
-   D09 colours from tokens · D10 one file · D11 no thank-you slide).
+   D09 colours from tokens · D10 one file · D11 no thank-you slide · D12 every sourced point opens its source).
 5. **Print it**: `python3 ${CLAUDE_SKILL_DIR}/scripts/print_check.py deck.html` prints it in Chrome and checks
    the PDF has one page per slide and no slide is too full. Open `deck.html?check=1` to see the same
    measurement in the page; it measures the 1280×720 slide at any window width. Inside an agent's sandbox Chrome's own sandbox often cannot start; the script then
    prints once more with `--no-sandbox` and says so in a `note:` line. If it still cannot print, report that —
    do not describe the printout as checked.
 6. **Read the titles alone**, top to bottom, out loud. Then open it offline and walk it with the keyboard.
+
+## Clickable number sources
+
+In a point that names a source, click a number (or the source note, when the point has no digits) and a panel shows
+the source as the outline states it, marked as stated: nobody opened the source or compared the number with it. The
+manifest is written by make_deck.py from the outline; D12 refuses a deck whose sourced points cannot open.
+
+The panel is the shared number-sources layer that nk-design, nk-data-story, nk-deck, nk-model and nk-explorer all
+use, the same three files in each (`scripts/numsrc.py`, `assets/numsrc.js`, `assets/numsrc.css`): Tab to a number, Enter
+or Space opens it, Esc closes it and puts the focus back; printed, the numbers are plain text. `python3
+${CLAUDE_SKILL_DIR}/scripts/numsrc.py check page.html` checks a page: every marked number has an entry, every entry says
+where from, how and what was not checked, and the runtime is the shipped one, byte for byte.
 
 ## Rules that keep it honest
 

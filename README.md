@@ -15,9 +15,10 @@ section below says which of them were broken on purpose before release to prove 
 - `assets/starter.html`, a working ten-slide deck on a 1280×720 stage: arrow keys, space, Home/End, P to print, `#7` opens slide 7, a phone layout that stays on screens, and `?check=1` to measure which slides are too full.
 - `scripts/make_deck.py`: a JSON outline becomes one file, tokens inlined, nothing fetched. It refuses an outline whose titles are labels, whose slides have a sixth point, or whose numbers have no source.
 - The deck carries its own type: the Latin subsets of Fraunces, Inter and Space Mono (SIL OFL 1.1, licences in `assets/fonts/`) are inlined, which adds 135,972 bytes to every deck. It still fetches nothing when it opens.
-- `scripts/deck_check.py`: eleven rules on the file, including the print CSS that keeps one slide per page.
+- `scripts/deck_check.py`: twelve rules on the file, including the print CSS that keeps one slide per page.
 - `scripts/print_check.py`: prints the deck in Chrome and checks the PDF has one page per slide and no slide is too full — the failure a file check cannot see.
 - The deck and two of the scripts are standard library only; `print_check.py` needs Chrome or Chromium.
+- Click a number in a sourced point to see its source as stated and what nobody checked (the shared number-sources layer, `numsrc.py`; D12).
 
 The full procedure, the boundaries and where the rules came from are in [SKILL.md](SKILL.md).
 
@@ -114,12 +115,16 @@ Route 4 was checked for this repository: cloned from GitHub into a temporary hom
 ```bash
 python3 scripts/deck_check.py --selftest
 python3 scripts/make_deck.py --selftest
+python3 scripts/numsrc.py --selftest
 python3 scripts/print_check.py --selftest
 ```
 
 Python 3.9+, standard library only; print_check.py also needs Google Chrome or Chromium. deck_check.py's
-rules were each broken on purpose in a sandbox copy — 52 breakages, each turning the sample written for it
+rules were each broken on purpose in a sandbox copy — 56 breakages, each turning the sample written for it
 red, none by a crash. make_deck.py and print_check.py have self-tests but no break matrix.
+numsrc.py, the number-sources layer shared with four other skills: each of its 16 lines that report a
+finding was disabled in a sandbox copy, found by reading the source rather than listed by hand, and its self-test went
+red each time; the unmutated copy stayed green.
 
 ## Limits
 
