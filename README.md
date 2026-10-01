@@ -1,19 +1,75 @@
 # nk-deck
 
-![nk-deck](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/social/nk-deck.png)
+A [Claude Code](https://code.claude.com) skill. Turn one sentence into a ten-slide single-file HTML deck whose titles carry the argument on their own, with a source under every number and a printout that is the same deck page for page.
 
-A [Claude Code](https://code.claude.com) skill. Turn one sentence — a topic and who it is for — into a ten-slide single-file HTML deck whose titles carry the argument on their own, five points at most per slide, a source under every number, and a printout that is the same deck page for page.
+**What you get.** Slide 2 of the ten-slide deck `make_deck.py --init` writes. The numbers are real: they are counted from two break runs of the author's own checking tools, and both raw outputs ship in `references/example-data/`. Recorded on 2026-09-30 with 0.1.7.
+
+![nk-deck: slide 2 of 10: a title that states its conclusion, and counted numbers with a source under each](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/results/nk-deck.png)
+
+## Try it
+
+Nothing is installed and nothing under `~/.claude` changes: clone, run the self-tests, run the example. It writes only `demo*` files inside the clone.
+
+```bash
+git clone https://github.com/NickkkLian/nk-deck && cd nk-deck
+python3 scripts/deck_check.py --selftest
+python3 scripts/make_deck.py --selftest
+python3 scripts/numsrc.py --selftest
+python3 scripts/print_check.py --selftest
+python3 scripts/make_deck.py --init demo-deck.json
+python3 scripts/make_deck.py demo-deck.json --out demo-deck.html
+python3 scripts/deck_check.py demo-deck.html --single
+sed 's/"title": "A crash is not a catch[^"]*"/"title": "Summary of our key findings"/' demo-deck.json > demo-label.json
+python3 scripts/make_deck.py demo-label.json --out demo-label.html
+```
+
+Each self-test ends on its own line:
+
+```text
+deck_check selftest · all samples behaved as written (60 cases)
+make_deck selftest: 15/15 passed
+selftest: 50/50
+print_check selftest: 3/3 passed
+```
+
+The example commands print this (recorded in a fresh copy; the self-test that opens Chrome ran with the normal home folder, everything else with an empty one; the path of the clone is taken out):
+
+```text
+$ python3 scripts/make_deck.py --init demo-deck.json
+wrote demo-deck.json — the example deck; replace every slide with yours, then run this again with it
+$ python3 scripts/make_deck.py demo-deck.json --out demo-deck.html
+wrote demo-deck.html · 10 slides · one file, nothing fetched when it opens
+print it: python3 scripts/print_check.py demo-deck.html   (needs Chrome; checks 10 pages)
+$ python3 scripts/deck_check.py demo-deck.html --single
+✔ demo-deck.html: 0 findings
+$ python3 scripts/make_deck.py demo-label.json --out demo-label.html
+refusing to write the deck:
+  D03 slide 4's title is a label, not a conclusion: 'Summary of our key findings'
+```
+
+Open `demo-deck.html` (arrow keys move, P prints): slide 2 is the picture above. The last command exits 1 on purpose: the line before it replaced one title with a label, and the builder refuses to write that deck. `print_check.py` and its self-test need Chrome or Chromium.
+
+### What to type
+
+With the skill installed ([Install](#install)), ask in plain words. This is the request a recorded test run used; it never names the skill:
+
+> Make me a short slide deck to convince my business partner that we should stop opening our café on Mondays. It's just the two of us. I want to click through it on my laptop and also print it out for her.
+
+![nk-deck](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/social/nk-deck.png)
 
 Part of [nickkk-skills](https://github.com/NickkkLian/nickkk-skills) — agent skills that ship a self-test with every script; the Verify
 section below says which of them were broken on purpose before release to prove they react.
 
 ![nk-deck demo: one idea in, a finished page out](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/nk-deck.gif)
 
+The demo above was recorded with the example deck that shipped until 0.1.6, a bakery's December menu with illustrative numbers. Since 0.1.7 `--init` writes the deck shown at the top of this page.
+
 ## What it does
 
 - Five invariants: every title states a conclusion; five points at most, one idea each; every measurement names its source or the deck says it is illustrative; one slide prints as one page with nothing cut off; it works from the keyboard and without a network.
 - `assets/starter.html`, a working ten-slide deck on a 1280×720 stage: arrow keys, space, Home/End, P to print, `#7` opens slide 7, a phone layout that stays on screens, and `?check=1` to measure which slides are too full.
 - `scripts/make_deck.py`: a JSON outline becomes one file, tokens inlined, nothing fetched. It refuses an outline whose titles are labels, whose slides have a sixth point, or whose numbers have no source.
+- The example deck (`--init`) argues a real case with counted numbers: break runs of ten checking tools, before and after one day of fixes. Both raw outputs ship in `references/example-data/`, and every number on a slide names the file it was counted from.
 - The deck carries its own type: the Latin subsets of Fraunces, Inter and Space Mono (SIL OFL 1.1, licences in `assets/fonts/`) are inlined, which adds 135,972 bytes to every deck. It still fetches nothing when it opens.
 - `scripts/deck_check.py`: twelve rules on the file, including the print CSS that keeps one slide per page.
 - `scripts/print_check.py`: prints the deck in Chrome and checks the PDF has one page per slide and no slide is too full — the failure a file check cannot see.
@@ -24,12 +80,12 @@ The full procedure, the boundaries and where the rules came from are in [SKILL.m
 
 ## How it works
 
-1. Write the argument before the slides
-2. Fill in the outline
-3. Write the file
-4. Check it
-5. Print it
-6. Read the titles alone
+1. Write the argument before the slides.
+2. Fill in the outline: `python3 scripts/make_deck.py --init deck.json` gives the example (a real argument whose numbers are counted from the two files in `references/example-data/`); replace every slide.
+3. Write the file: `python3 scripts/make_deck.py deck.json --out deck.html`.
+4. Check it: `python3 scripts/deck_check.py deck.html --single`.
+5. Print it: `python3 scripts/print_check.py deck.html` prints it in Chrome and checks the PDF has one page per slide and no slide is too full.
+6. Read the titles alone, top to bottom, out loud.
 
 ## Why it is built this way
 
