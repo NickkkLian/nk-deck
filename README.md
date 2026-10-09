@@ -1,8 +1,8 @@
 # nk-deck
 
-A [Claude Code](https://code.claude.com) skill. Turn one sentence into a ten-slide single-file HTML deck whose titles carry the argument on their own, with a source under every number and a printout that is the same deck page for page.
+A [Claude Code](https://code.claude.com) skill. Turn one sentence into a ten-slide HTML deck whose titles carry the argument on their own, with a source under every number and a printout that is the same deck page for page.
 
-**What you get.** Slide 2 of the ten-slide deck `make_deck.py --init` writes. The numbers are real: they are counted from two break runs of the author's own checking tools, and both raw outputs ship in `references/example-data/`. Recorded on 2026-09-30 with 0.1.7.
+**What you get.** Slide 2 of the ten-slide deck `make_deck.py --init` writes. The numbers are real: they are counted from two break runs of the author's own checking tools, and both raw outputs ship in `references/example-data/`. Recorded on 2026-10-09 with 0.1.8.
 
 ![nk-deck: slide 2 of 10: a title that states its conclusion, and counted numbers with a source under each](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/results/nk-deck.png)
 
