@@ -2,20 +2,18 @@
 
 A [Claude Code](https://code.claude.com) skill. Turn one sentence into a ten-slide HTML deck whose titles carry the argument on their own, with a source under every number and a printout that is the same deck page for page.
 
-**What you get.** Slide 2 of the ten-slide deck `make_deck.py --init` writes. The numbers are real: they are counted from two break runs of the author's own checking tools, and both raw outputs ship in `references/example-data/`. Recorded on 2026-10-09 with 0.1.8.
+**What you get:** slides whose titles make the case on their own. Below is slide 2 of the example deck `make_deck.py --init` writes. Its title is the conclusion ("A green self-test noticed only half of the lines we switched off"), and every number on it is real, counted from one of the two raw files that ship in `references/example-data/` (break runs of the author's own checking tools), and names that file.
 
 ![nk-deck: slide 2 of 10: a title that states its conclusion, and counted numbers with a source under each](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/results/nk-deck.png)
 
+Part of [nickkk-skills](https://github.com/NickkkLian/nickkk-skills): 14 agent skills that work with numbers, check an agent's work, guard a repository, and write and present.
+
 ## Try it
 
-Nothing is installed and nothing under `~/.claude` changes: clone, run the self-tests, run the example. It writes only `demo*` files inside the clone.
+Clone and run the example:
 
 ```bash
 git clone https://github.com/NickkkLian/nk-deck && cd nk-deck
-python3 scripts/deck_check.py --selftest
-python3 scripts/make_deck.py --selftest
-python3 scripts/numsrc.py --selftest
-python3 scripts/print_check.py --selftest
 python3 scripts/make_deck.py --init demo-deck.json
 python3 scripts/make_deck.py demo-deck.json --out demo-deck.html
 python3 scripts/deck_check.py demo-deck.html --single
@@ -23,16 +21,9 @@ sed 's/"title": "A crash is not a catch[^"]*"/"title": "Summary of our key findi
 python3 scripts/make_deck.py demo-label.json --out demo-label.html
 ```
 
-Each self-test ends on its own line:
+None of this installs anything or changes `~/.claude`; it writes only `demo*` files inside the clone.
 
-```text
-deck_check selftest · all samples behaved as written (60 cases)
-make_deck selftest: 15/15 passed
-selftest: 50/50
-print_check selftest: 3/3 passed
-```
-
-The example commands print this (recorded in a fresh copy; the self-test that opens Chrome ran with the normal home folder, everything else with an empty one; the path of the clone is taken out):
+The example commands print this (recorded in a fresh copy with an empty home folder; the path of the clone is taken out):
 
 ```text
 $ python3 scripts/make_deck.py --init demo-deck.json
@@ -56,9 +47,6 @@ With the skill installed ([Install](#install)), ask in plain words. This is the 
 > Make me a short slide deck to convince my business partner that we should stop opening our café on Mondays. It's just the two of us. I want to click through it on my laptop and also print it out for her.
 
 ![nk-deck](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/social/nk-deck.png)
-
-Part of [nickkk-skills](https://github.com/NickkkLian/nickkk-skills) — agent skills that ship a self-test with every script; the Verify
-section below says which of them were broken on purpose before release to prove they react.
 
 ![nk-deck demo: one idea in, a finished page out](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/nk-deck.gif)
 
@@ -174,6 +162,17 @@ python3 scripts/make_deck.py --selftest
 python3 scripts/numsrc.py --selftest
 python3 scripts/print_check.py --selftest
 ```
+
+Each self-test ends on its own line (the self-test that opens Chrome ran with the normal home folder, the others with an empty one):
+
+```text
+deck_check selftest · all samples behaved as written (60 cases)
+make_deck selftest: 15/15 passed
+selftest: 50/50
+print_check selftest: 3/3 passed
+```
+
+The picture at the top of this page was recorded on 2026-10-09 with 0.1.8.
 
 Python 3.9+, standard library only; print_check.py also needs Google Chrome or Chromium. deck_check.py's
 rules were each broken on purpose in a sandbox copy — 56 breakages, each turning the sample written for it
