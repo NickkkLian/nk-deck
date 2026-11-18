@@ -2,7 +2,7 @@
 
 A [Claude Code](https://code.claude.com) skill. Turn one sentence into a ten-slide HTML deck whose titles carry the argument on their own, with a source under every number and a printout that is the same deck page for page.
 
-**What you get:** slides whose titles make the case on their own. Below is slide 2 of the example deck `make_deck.py --init` writes. Its title is the conclusion ("A green self-test noticed only half of the lines we switched off"), and every number on it is real, counted from one of the two raw files that ship in `references/example-data/` (break runs of the author's own checking tools), and names that file.
+**What you get:** slide 2 of the example deck `make_deck.py --init` writes. Its title is the conclusion ("A green self-test noticed only half of the lines we switched off"), and every number on it is real, counted from one of the two raw files that ship in `references/example-data/` (break runs of the author's own checking tools), and names that file.
 
 ![nk-deck: slide 2 of 10: a title that states its conclusion, and counted numbers with a source under each](https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/results/nk-deck.png)
 
@@ -118,7 +118,7 @@ Without opening a session, the same two steps work from a shell: `claude plugin 
 
 <img src="https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/panel-route/panel-route.gif" alt="Adding the marketplace and installing a skill in the desktop app" width="640">
 
-<sub>Recorded on 2026-09-16, when the marketplace listed ten skills, all at version 0.1.0; it lists more now. The repository list in this recording shows the recorder's own repositories because a GitHub account is connected; yours will show yours. Type the full name as in step 4.</sub>
+<sub>Recorded on 2026-09-16; the marketplace lists more skills now. The repository list shows the recorder's own repositories because a GitHub account is connected; yours will show yours. Type the full name as in step 4.</sub>
 
 1. In the chat box, type `/plugin marketplace` and press Enter (or open **Settings → Customize → Plugins**). The **Plugins** panel opens.
    <br><img src="https://raw.githubusercontent.com/NickkkLian/nickkk-skills/main/gallery/panel-route/step1-type-plugin-marketplace.png" alt="/plugin marketplace typed in the chat box" width="480">
@@ -178,7 +178,7 @@ Python 3.9+, standard library only; print_check.py also needs Google Chrome or C
 rules were each broken on purpose in a sandbox copy — 56 breakages, each turning the sample written for it
 red, none by a crash. make_deck.py and print_check.py have self-tests but no break matrix.
 numsrc.py, the number-sources layer shared with four other skills: each of its 16 lines that report a
-finding was disabled in a sandbox copy, found by reading the source rather than listed by hand, and its self-test went
+finding was disabled in a sandbox copy, and its self-test went
 red each time; the unmutated copy stayed green.
 
 ## Limits
